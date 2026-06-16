@@ -78,7 +78,11 @@ export function QuizLayout({
           {children}
         </main>
 
-        {footer && <footer className="quiz-footer safe-bottom">{footer}</footer>}
+        {footer && (
+          <footer className="quiz-footer safe-bottom">
+            <div className="quiz-footer-inner">{footer}</div>
+          </footer>
+        )}
       </div>
     </div>
   );

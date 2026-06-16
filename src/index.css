@@ -64,7 +64,7 @@
   }
 
   .quiz-shell {
-    @apply relative flex min-h-dvh w-full flex-col bg-foggy;
+    @apply relative mx-auto flex min-h-dvh w-full max-w-[640px] flex-col bg-foggy md:shadow-[0_0_0_1px_rgba(0,0,0,0.04)];
   }
 
   .quiz-header {
@@ -84,7 +84,11 @@
   }
 
   .quiz-footer {
-    @apply fixed bottom-0 left-0 right-0 z-20 w-full border-t border-deco/60 bg-foggy/95 px-5 py-4 backdrop-blur-sm;
+    @apply fixed bottom-0 left-0 right-0 z-20 w-full border-t border-deco/60 bg-foggy/95 py-4 backdrop-blur-sm;
+  }
+
+  .quiz-footer-inner {
+    @apply mx-auto w-full max-w-[640px] px-5;
   }
 
   .quiz-title {
@@ -225,7 +229,8 @@
   }
 
   .welcome-hero-image {
-    @apply drop-shadow-[0_8px_24px_rgba(0,0,0,0.08)];
+    @apply overflow-hidden rounded-airbnb-lg shadow-[0_12px_40px_rgba(0,0,0,0.18)];
+    aspect-ratio: 3 / 2;
   }
 
   .face-capture-viewport {
@@ -239,7 +244,7 @@
   }
 
   .quiz-shell-face-scan {
-    @apply h-dvh overflow-hidden bg-black;
+    @apply h-dvh max-w-none overflow-hidden bg-black shadow-none;
   }
 
   .quiz-content-face-scan {

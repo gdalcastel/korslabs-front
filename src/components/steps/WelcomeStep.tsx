@@ -46,31 +46,32 @@ interface WelcomeStepProps {
   locale: Locale;
 }
 
+const WELCOME_HERO_IMAGE = '/42D8559D-44B8-4264-B887-213C03A65370.PNG';
+
 export function WelcomeStep({ step, locale }: WelcomeStepProps) {
   return (
-    <div className="flex flex-1 flex-col">
+    <div className="flex flex-1 flex-col md:items-center md:text-center">
       <div className="mb-6 flex justify-center pt-2">
         <KorLogo variant="welcome" />
       </div>
 
-      <div className="welcome-hero-image mx-auto mb-8 w-full max-w-[360px] md:max-w-[480px] lg:max-w-[520px]">
-        <picture>
-          <source type="image/webp" srcSet="/welcome-skin-analysis.webp" />
-          <img
-            src="/welcome-skin-analysis.png"
-            srcSet="/welcome-skin-analysis.png 1024w"
-            sizes="(min-width: 1024px) 520px, (min-width: 768px) 480px, 360px"
-            alt={
-              locale === 'pt'
-                ? 'Análise de pele com IA — hidratação, rugas, manchas, elasticidade, textura e barreira cutânea'
-                : locale === 'es'
-                  ? 'Análisis de piel con IA — hidratación, arrugas, manchas, elasticidad, textura y barrera cutánea'
-                  : 'AI-powered skin analysis — hydration, wrinkles, dark spots, elasticity, texture and skin barrier'
-            }
-            className="h-auto w-full object-contain"
-            draggable={false}
-          />
-        </picture>
+      <div className="welcome-hero-image mx-auto mb-8 w-full max-w-[360px] md:max-w-[480px] lg:max-w-[560px]">
+        <img
+          src={WELCOME_HERO_IMAGE}
+          srcSet={`${WELCOME_HERO_IMAGE} 1536w`}
+          sizes="(min-width: 1024px) 560px, (min-width: 768px) 480px, 360px"
+          alt={
+            locale === 'pt'
+              ? 'Análise de pele com IA — hidratação, rugas, manchas, elasticidade, textura e barreira cutânea'
+              : locale === 'es'
+                ? 'Análisis de piel con IA — hidratación, arrugas, manchas, elasticidad, textura y barrera cutánea'
+                : 'AI-powered skin analysis — hydration, wrinkles, dark spots, elasticity, texture and skin barrier'
+          }
+          className="h-auto w-full object-contain"
+          draggable={false}
+          fetchPriority="high"
+          decoding="async"
+        />
       </div>
 
       <h1 className="quiz-title text-[28px] leading-[1.15]">{step.title && t(step.title, locale)}</h1>
@@ -79,7 +80,7 @@ export function WelcomeStep({ step, locale }: WelcomeStepProps) {
         <p className="mt-3 text-[14px] leading-snug text-hof/80">{t(step.subtitle, locale)}</p>
       )}
 
-      <ul className="mt-5 space-y-4">
+      <ul className="mt-5 space-y-4 md:w-fit md:text-left">
         {features.map((item) => (
           <li key={item.key} className="flex items-start gap-3">
             <span className="check-badge" aria-hidden>

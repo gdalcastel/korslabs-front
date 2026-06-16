@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { quizSteps } from '@/lib/flatten-steps';
 import { detectLocale } from '@/lib/i18n';
-import { getStepIndexFromUrl } from '@/lib/quiz-url';
+import { getStepIndexFromUrl, syncQuizRoute } from '@/lib/quiz-url';
 import { useQuizStore } from '@/store/quiz-store';
 
 export function useQuizHydration(): boolean {
@@ -9,6 +9,8 @@ export function useQuizHydration(): boolean {
 
   useEffect(() => {
     const finishHydration = () => {
+      syncQuizRoute();
+
       const state = useQuizStore.getState();
       const urlIndex = getStepIndexFromUrl();
 
