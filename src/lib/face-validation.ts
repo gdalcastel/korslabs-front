@@ -35,7 +35,7 @@ export const FACE_CONTOUR_PATH =
 
 const MIN_BRIGHTNESS = 55;
 const MAX_BRIGHTNESS = 210;
-const MIN_SHARPNESS = 80;
+const MIN_SHARPNESS = 28;
 
 function isPointInOval(px: number, py: number, oval: OvalGuide): boolean {
   const dx = (px - oval.cx) / oval.rx;

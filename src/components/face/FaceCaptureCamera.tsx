@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FaceScanAnimation } from '@/components/face/FaceScanAnimation';
 import { UiIcon } from '@/components/icons/UiIcons';
 import { useFaceDetector } from '@/hooks/useFaceDetector';
@@ -125,17 +125,13 @@ const UI: Record<string, Record<Locale, string>> = {
   },
 };
 
-function FaceContourOverlay({ ready, maskId }: { ready: boolean; maskId: string }) {
+const FACE_OVERLAY_PATH = `M0 0 H100 V100 H0 Z ${FACE_CONTOUR_PATH}`;
+
+function FaceContourOverlay({ ready }: { ready: boolean }) {
   return (
-    <div className="pointer-events-none absolute inset-0">
-      <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden>
-        <defs>
-          <mask id={maskId}>
-            <rect width="100" height="100" fill="white" />
-            <path d={FACE_CONTOUR_PATH} fill="black" />
-          </mask>
-        </defs>
-        <rect width="100" height="100" fill="rgba(0,0,0,0.55)" mask={`url(#${maskId})`} />
+    <div className="pointer-events-none absolute inset-0 z-10">
+      <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden>
+        <path d={FACE_OVERLAY_PATH} fill="rgba(0,0,0,0.62)" fillRule="evenodd" />
         <path
           d={FACE_CONTOUR_PATH}
           fill="none"
@@ -151,7 +147,6 @@ function FaceContourOverlay({ ready, maskId }: { ready: boolean; maskId: string 
 }
 
 export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps) {
-  const maskId = useId().replace(/:/g, '');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -331,7 +326,11 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
+    ctx.save();
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
     ctx.drawImage(video, 0, 0);
+    ctx.restore();
 
     return canvas.toDataURL('image/jpeg', 0.92);
   };
@@ -419,7 +418,7 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
     <div className="face-capture-fullscreen">
       <video ref={videoRef} playsInline muted autoPlay className="face-capture-video face-capture-video--live" />
 
-      <FaceContourOverlay ready={canCapture} maskId={maskId} />
+      <FaceContourOverlay ready={canCapture} />
 
       {isCameraLoading && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">

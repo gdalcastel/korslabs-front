@@ -281,13 +281,76 @@
     animation: face-scan-sweep 1.6s ease-in-out infinite;
   }
 
+  .face-scan-beam {
+    @apply pointer-events-none absolute inset-x-[8%] z-[11] h-[3px] rounded-full;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(155, 240, 225, 0.15) 20%,
+      rgba(155, 240, 225, 0.95) 50%,
+      rgba(155, 240, 225, 0.15) 80%,
+      transparent 100%
+    );
+    box-shadow:
+      0 0 8px rgba(155, 240, 225, 0.8),
+      0 0 20px rgba(155, 240, 225, 0.45),
+      0 0 40px rgba(155, 240, 225, 0.2);
+    animation: face-scan-sweep 1.8s ease-in-out infinite;
+  }
+
+  .face-scan-beam--secondary {
+    @apply h-[1px] opacity-60;
+    animation-duration: 2.4s;
+    animation-delay: 0.6s;
+  }
+
+  .face-scan-shimmer {
+    @apply pointer-events-none absolute inset-x-[18%] z-[11] h-16 rounded-full opacity-0;
+    top: 14%;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(155, 240, 225, 0.08) 40%,
+      rgba(155, 240, 225, 0.22) 50%,
+      rgba(155, 240, 225, 0.08) 60%,
+      transparent 100%
+    );
+    animation: face-scan-shimmer 1.8s ease-in-out infinite;
+  }
+
   .face-scan-contour-stroke {
     stroke-dasharray: 4 2;
     animation: face-scan-contour 1.2s linear infinite;
   }
 
+  .face-scan-contour-glow {
+    animation: face-scan-contour-pulse 1.6s ease-in-out infinite;
+  }
+
   .face-scan-animation-status {
-    @apply absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-3 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-20;
+    @apply absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-4 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-20;
+  }
+
+  .face-scan-phrase-wrap {
+    @apply flex min-h-[3rem] w-full max-w-xs items-center justify-center;
+  }
+
+  .face-scan-phrase {
+    @apply text-center text-[15px] font-medium leading-snug text-white;
+    animation: face-scan-phrase-in 0.5s ease-out both;
+  }
+
+  .face-scan-progress {
+    @apply flex items-center justify-center gap-2;
+  }
+
+  .face-scan-progress-dot {
+    @apply h-1.5 w-1.5 rounded-full bg-white/25 transition-all duration-300;
+  }
+
+  .face-scan-progress-dot--active {
+    @apply w-5 bg-[#9BF0E1];
+    box-shadow: 0 0 8px rgba(155, 240, 225, 0.65);
   }
 
   .face-scan-spinner {
@@ -312,6 +375,44 @@
   @keyframes face-scan-contour {
     to {
       stroke-dashoffset: -24;
+    }
+  }
+
+  @keyframes face-scan-contour-pulse {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 0.85;
+    }
+  }
+
+  @keyframes face-scan-shimmer {
+    0% {
+      top: 14%;
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    85% {
+      opacity: 1;
+    }
+    100% {
+      top: 78%;
+      opacity: 0;
+    }
+  }
+
+  @keyframes face-scan-phrase-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 
