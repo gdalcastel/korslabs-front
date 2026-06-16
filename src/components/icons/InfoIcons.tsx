@@ -3,7 +3,7 @@ import type { InfoSlide } from '@/types/quiz';
 
 type InfoImageKey = NonNullable<InfoSlide['image']> | 'default';
 
-const accent = '#222222';
+const accent = '#C9A962';
 
 export function InfoIcon({ type }: { type: InfoImageKey }) {
   const icons: Record<InfoImageKey, ReactNode> = {

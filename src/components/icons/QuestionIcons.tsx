@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-const iconClass = 'text-rausch';
+const iconClass = 'text-gold';
 
 export function QuestionIcon({ id }: { id: string }) {
   const icons: Record<string, ReactNode> = {

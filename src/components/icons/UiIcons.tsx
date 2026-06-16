@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-const accent = '#222222';
+const accent = '#C9A962';
 
 export type UiIconName =
   | 'location'

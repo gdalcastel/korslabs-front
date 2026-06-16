@@ -64,6 +64,9 @@ export function WelcomeStep({ step, locale }: WelcomeStepProps) {
 
       <h1 className="quiz-title text-[28px] leading-[1.15]">{step.title && t(step.title, locale)}</h1>
       <p className="mt-6 text-[17px] font-semibold text-hof">{step.body && t(step.body, locale)}</p>
+      {step.subtitle && (
+        <p className="mt-3 text-[14px] leading-snug text-hof/80">{t(step.subtitle, locale)}</p>
+      )}
 
       <ul className="mt-5 space-y-4">
         {features.map((item) => (

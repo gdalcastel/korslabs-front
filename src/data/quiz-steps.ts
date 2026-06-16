@@ -29,14 +29,19 @@ export const quizSteps: QuizStep[] = [
     section: 1,
     kind: 'welcome',
     title: {
-      en: 'Welcome to your program with face scan analysis',
-      pt: 'Bem-vindo(a) ao seu programa com análise facial',
-      es: 'Bienvenido(a) a tu programa con análisis facial',
+      en: 'Intelligent facial analysis',
+      pt: 'Análise facial inteligente',
+      es: 'Análisis facial inteligente',
     },
     body: {
-      en: 'The program includes',
-      pt: 'O programa inclui',
-      es: 'El programa incluye',
+      en: 'Discover what your skin really needs.',
+      pt: 'Descubra o que sua pele realmente precisa.',
+      es: 'Descubre lo que tu piel realmente necesita.',
+    },
+    subtitle: {
+      en: 'Our technology analyzes more than 15 skin parameters to create a personalized skincare routine.',
+      pt: 'Nossa tecnologia analisa mais de 15 parâmetros da sua pele para criar uma rotina personalizada de skincare.',
+      es: 'Nuestra tecnología analiza más de 15 parámetros de tu piel para crear una rutina personalizada de skincare.',
     },
     cta: {
       en: 'Ok, I got it',
