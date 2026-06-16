@@ -1,0 +1,236 @@
+@font-face {
+  font-family: 'Airbnb Cereal App';
+  src: url('https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/AirbnbCereal_W_Lt.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Airbnb Cereal App';
+  src: url('https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/AirbnbCereal_W_Bk.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Airbnb Cereal App';
+  src: url('https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/AirbnbCereal_W_Md.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Airbnb Cereal App';
+  src: url('https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/AirbnbCereal_W_Bd.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Airbnb Cereal App';
+  src: url('https://a0.muscache.com/airbnb/static/airbnb-dls-web/build/fonts/AirbnbCereal_W_XBd.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply font-cereal text-hof antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply m-0 bg-foggy;
+    overscroll-behavior: none;
+  }
+
+  #root {
+    @apply min-h-dvh;
+  }
+}
+
+@layer components {
+  .quiz-page {
+    @apply min-h-dvh w-full bg-foggy;
+  }
+
+  .quiz-shell {
+    @apply relative flex min-h-dvh w-full flex-col bg-foggy;
+  }
+
+  .quiz-header {
+    @apply sticky top-0 z-20 bg-foggy/95 px-5 pb-3 pt-[max(0.75rem,env(safe-area-inset-top))] backdrop-blur-sm md:px-8;
+  }
+
+  .quiz-header-welcome {
+    @apply pb-0 pt-[max(1rem,env(safe-area-inset-top))];
+  }
+
+  .quiz-content {
+    @apply flex flex-1 flex-col px-5 pb-8 pt-2 md:px-8;
+  }
+
+  .quiz-content-with-footer {
+    @apply pb-32;
+  }
+
+  .quiz-footer {
+    @apply fixed bottom-0 left-0 right-0 z-20 w-full border-t border-deco/60 bg-foggy/95 px-5 py-4 backdrop-blur-sm;
+  }
+
+  .quiz-title {
+    @apply text-[26px] font-bold leading-[1.15] tracking-tight text-hof md:text-[28px];
+  }
+
+  .quiz-subtitle {
+    @apply mt-3 text-[15px] leading-relaxed text-[#5c5c5c] md:text-[16px];
+  }
+
+  .back-btn {
+    @apply flex h-10 w-10 items-center justify-center rounded-full transition-colors active:bg-white/80;
+  }
+
+  .segment-track {
+    @apply h-1.5 overflow-hidden rounded-pill bg-[#d9d9d9];
+  }
+
+  .segment-fill {
+    @apply h-full rounded-pill transition-all duration-500 ease-out;
+    background-color: theme('colors.quiz.accent');
+  }
+
+  .option-pill {
+    @apply flex w-full items-center gap-3 rounded-pill border border-transparent bg-white px-4 py-4 text-left shadow-[0_2px_12px_rgba(0,0,0,0.06)] transition-all duration-200 active:scale-[0.99] md:px-5 md:py-[18px];
+  }
+
+  .option-pill-selected {
+    border-color: rgb(91 84 255 / 0.3);
+    @apply shadow-[0_4px_16px_rgba(91,84,255,0.12)];
+  }
+
+  .option-radio {
+    @apply flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#c7c7c7];
+  }
+
+  .option-radio-selected {
+    border-color: theme('colors.quiz.accent');
+  }
+
+  .option-radio-dot {
+    @apply h-2.5 w-2.5 rounded-full;
+    background-color: theme('colors.quiz.accent');
+  }
+
+  .btn-primary-wrap {
+    @apply relative w-full;
+  }
+
+  .btn-primary-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, rgba(61, 54, 232, 0.55) 0%, rgba(91, 84, 255, 0.7) 50%, rgba(107, 99, 255, 0.55) 100%);
+    filter: blur(10px);
+    opacity: 0.85;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .btn-primary {
+    @apply relative z-[1] inline-flex h-[52px] w-full items-center justify-center rounded-pill px-6 text-[16px] font-semibold text-white transition-all duration-200 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40;
+    background-image: theme('backgroundImage.quiz-gradient');
+    box-shadow: 0 8px 24px rgba(91, 84, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .btn-primary-wrap:has(.btn-primary:disabled)::before {
+    opacity: 0.35;
+  }
+
+  .btn-secondary {
+    @apply inline-flex h-[52px] w-full items-center justify-center rounded-pill border border-hof/20 bg-white px-6 text-[16px] font-semibold text-hof transition-all duration-200 active:scale-[0.98];
+  }
+
+  .info-card {
+    @apply rounded-airbnb-lg border border-deco bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)];
+  }
+
+  .info-step {
+    @apply space-y-5;
+    animation: info-fade-in 0.45s ease-out both;
+  }
+
+  .info-step-icon {
+    @apply flex h-[72px] w-[72px] items-center justify-center rounded-[20px] border border-white bg-white shadow-[0_4px_20px_rgba(91,84,255,0.1)];
+    background: linear-gradient(145deg, #ffffff 0%, #f3f2ff 100%);
+  }
+
+  .icon-badge {
+    background: linear-gradient(145deg, #ffffff 0%, #f3f2ff 100%);
+  }
+
+  .info-step-title {
+    animation: info-slide-up 0.5s ease-out 0.08s both;
+  }
+
+  .info-step-body {
+    animation: info-slide-up 0.5s ease-out 0.14s both;
+  }
+
+  .info-highlight {
+    @apply relative overflow-hidden rounded-airbnb-lg border border-deco/80 bg-white p-5 shadow-[0_2px_12px_rgba(0,0,0,0.04)];
+    animation: info-slide-up 0.5s ease-out 0.2s both;
+  }
+
+  .info-highlight-accent {
+    @apply absolute bottom-0 left-0 top-0 w-1;
+    background: linear-gradient(180deg, #6b63ff 0%, #3d36e8 100%);
+  }
+
+  .info-highlight p {
+    @apply pl-3;
+  }
+
+  @keyframes info-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes info-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .check-badge {
+    @apply mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rausch;
+  }
+
+  .welcome-hero-image {
+    @apply drop-shadow-[0_8px_24px_rgba(0,0,0,0.08)];
+  }
+}
+
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
