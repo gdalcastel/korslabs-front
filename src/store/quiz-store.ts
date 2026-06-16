@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import { quizSteps } from '@/lib/flatten-steps';
 import { buildPlan, buildProfile } from '@/lib/quiz-engine';
+import { getInitialStepIndex, updateQuizStepUrl } from '@/lib/quiz-url';
 import type { EnvironmentData, QuizState, Locale } from '@/types/quiz';
 
 const initialState = {
   locale: 'pt' as Locale,
-  currentStepIndex: 0,
+  currentStepIndex: getInitialStepIndex(),
   answers: {} as QuizState['answers'],
   environment: null as EnvironmentData | null,
   faceImage: null as string | null,
@@ -66,7 +67,10 @@ export const useQuizStore = create<QuizState>((set, get) => ({
     });
   },
 
-  reset: () => set(initialState),
+  reset: () => {
+    set({ ...initialState, currentStepIndex: 0 });
+    updateQuizStepUrl(0);
+  },
 }));
 
 export { quizSteps } from '@/lib/flatten-steps';

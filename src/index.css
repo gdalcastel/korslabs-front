@@ -227,6 +227,25 @@
   .welcome-hero-image {
     @apply drop-shadow-[0_8px_24px_rgba(0,0,0,0.08)];
   }
+
+  .face-capture-viewport {
+    @apply relative mx-auto overflow-hidden rounded-airbnb-lg bg-black shadow-[0_2px_12px_rgba(0,0,0,0.08)];
+    width: min(100%, 360px, calc((100dvh - 260px) * 0.75));
+    aspect-ratio: 3 / 4;
+  }
+
+  .face-capture-viewport video,
+  .face-capture-viewport img {
+    @apply absolute inset-0 h-full w-full object-cover;
+  }
+
+  .face-capture-viewport video {
+    transform: scaleX(-1);
+  }
+
+  .face-scan-step {
+    @apply mx-auto w-full max-w-[480px];
+  }
 }
 
 @layer utilities {

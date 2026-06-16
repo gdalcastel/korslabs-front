@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { useQuizStepUrl } from '@/hooks/useQuizStepUrl';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
 import { QuizLayout } from '@/components/QuizLayout';
 import { EnvironmentStep } from '@/components/steps/EnvironmentStep';
@@ -26,11 +27,14 @@ export function QuizApp() {
     setAnswer,
     nextStep,
     prevStep,
+    goToStep,
     setEnvironment,
     setFaceImage,
     computeResults,
     reset,
   } = useQuizStore();
+
+  useQuizStepUrl(currentStepIndex, goToStep);
 
   const step = quizSteps[currentStepIndex];
   const isFirst = currentStepIndex === 0;

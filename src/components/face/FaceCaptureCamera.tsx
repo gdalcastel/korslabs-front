@@ -313,14 +313,8 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
 
   return (
     <div className="space-y-4">
-      <div className="relative overflow-hidden rounded-airbnb-lg bg-black shadow-[0_2px_12px_rgba(0,0,0,0.08)]">
-        <video
-          ref={videoRef}
-          playsInline
-          muted
-          autoPlay
-          className="aspect-[3/4] w-full scale-x-[-1] object-cover"
-        />
+      <div className="face-capture-viewport">
+        <video ref={videoRef} playsInline muted autoPlay />
 
         <FaceOvalOverlay ready={canCapture} />
 
@@ -344,7 +338,7 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
 
       <canvas ref={canvasRef} className="hidden" aria-hidden />
 
-      <div className="flex flex-col items-center gap-3">
+      <div className="flex flex-col items-center gap-3 mx-auto w-full max-w-[360px]">
         <button
           type="button"
           onClick={handleCapture}

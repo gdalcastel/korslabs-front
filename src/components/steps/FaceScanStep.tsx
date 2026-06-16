@@ -24,15 +24,15 @@ export function FaceScanStep({ step, locale, faceImage, onImage, onComplete }: F
   };
 
   return (
-    <div className="space-y-6">
+    <div className="face-scan-step space-y-6">
       <h1 className="quiz-title">{step.title && t(step.title, locale)}</h1>
       <p className="quiz-subtitle">{step.subtitle && t(step.subtitle, locale)}</p>
 
       {!faceImage && !analysing && <FaceCaptureCamera locale={locale} onCapture={handleCapture} />}
 
       {faceImage && (
-        <div className="relative overflow-hidden rounded-airbnb-lg">
-          <img src={faceImage} alt="Face scan" className="aspect-[3/4] w-full object-cover" />
+        <div className="face-capture-viewport">
+          <img src={faceImage} alt="Face scan" />
           {analysing && (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
               <div className="h-16 w-16 animate-pulse rounded-full border-4 border-white/30 border-t-white" />
