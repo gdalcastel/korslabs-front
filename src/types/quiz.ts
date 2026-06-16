@@ -31,14 +31,14 @@ export interface QuizStep {
   id: string;
   section: number;
   phase?: 1 | 2 | 3;
-  kind: 'welcome' | 'info' | 'question' | 'questions' | 'environment' | 'fit-comparison' | 'profile-summary' | 'face-scan' | 'results';
+  kind: 'welcome' | 'info' | 'trust' | 'fit-preview' | 'skin-insight' | 'question' | 'questions' | 'environment' | 'fit-comparison' | 'profile-summary' | 'face-scan' | 'results';
   title?: LocalizedText;
   subtitle?: LocalizedText;
   body?: LocalizedText;
   cta?: LocalizedText;
   questions?: QuizQuestion[];
   question?: QuizQuestion;
-  variant?: 'swatch';
+  variant?: 'swatch' | 'swatch-row' | 'face-map';
   info?: InfoSlide;
 }
 

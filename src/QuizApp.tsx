@@ -1,4 +1,8 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  QuizStepTransition,
+  type QuizTransitionDirection,
+} from '@/components/QuizStepTransition';
 import { useQuizHydration } from '@/hooks/useQuizHydration';
 import { useQuizStepUrl } from '@/hooks/useQuizStepUrl';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
@@ -6,10 +10,13 @@ import { QuizLayout } from '@/components/QuizLayout';
 import { EnvironmentStep } from '@/components/steps/EnvironmentStep';
 import { FaceScanStep } from '@/components/steps/FaceScanStep';
 import { FitComparisonStep } from '@/components/steps/FitComparisonStep';
+import { FitPreviewStep } from '@/components/steps/FitPreviewStep';
 import { InfoStep } from '@/components/steps/InfoStep';
 import { ProfileSummaryStep } from '@/components/steps/ProfileSummaryStep';
 import { QuestionStep, isQuestionStepComplete } from '@/components/steps/QuestionStep';
 import { ResultsStep } from '@/components/steps/ResultsStep';
+import { SkinInsightStep } from '@/components/steps/SkinInsightStep';
+import { TrustStep } from '@/components/steps/TrustStep';
 import { WelcomeStep } from '@/components/steps/WelcomeStep';
 import { getPhaseProgress } from '@/lib/flatten-steps';
 import { t } from '@/lib/i18n';
@@ -38,6 +45,17 @@ export function QuizApp() {
   const hydrated = useQuizHydration();
   useQuizStepUrl(currentStepIndex, goToStep);
 
+  const prevStepIndexRef = useRef(currentStepIndex);
+  const [transitionDirection, setTransitionDirection] = useState<QuizTransitionDirection>('forward');
+
+  useLayoutEffect(() => {
+    const prevIndex = prevStepIndexRef.current;
+    if (currentStepIndex !== prevIndex) {
+      setTransitionDirection(currentStepIndex > prevIndex ? 'forward' : 'backward');
+      prevStepIndexRef.current = currentStepIndex;
+    }
+  }, [currentStepIndex]);
+
   const step = quizSteps[currentStepIndex];
   const isFirst = currentStepIndex === 0;
   const { phase, phaseProgress } = getPhaseProgress(quizSteps, currentStepIndex);
@@ -46,6 +64,9 @@ export function QuizApp() {
     switch (step.kind) {
       case 'welcome':
       case 'info':
+      case 'trust':
+      case 'fit-preview':
+      case 'skin-insight':
       case 'environment':
       case 'fit-comparison':
       case 'profile-summary':
@@ -63,7 +84,7 @@ export function QuizApp() {
 
   const needsContinueButton = useMemo(() => {
     if (step.kind === 'welcome') return true;
-    if (step.kind === 'info' || step.kind === 'environment' || step.kind === 'fit-comparison' || step.kind === 'profile-summary') {
+    if (step.kind === 'info' || step.kind === 'trust' || step.kind === 'fit-preview' || step.kind === 'skin-insight' || step.kind === 'environment' || step.kind === 'fit-comparison' || step.kind === 'profile-summary') {
       return true;
     }
     if (step.kind === 'question') {
@@ -104,6 +125,12 @@ export function QuizApp() {
         return <WelcomeStep step={step} locale={locale} />;
       case 'info':
         return step.info ? <InfoStep info={step.info} locale={locale} /> : null;
+      case 'trust':
+        return <TrustStep step={step} locale={locale} />;
+      case 'fit-preview':
+        return <FitPreviewStep locale={locale} answers={answers} />;
+      case 'skin-insight':
+        return <SkinInsightStep locale={locale} answers={answers} />;
       case 'question':
         return (
           <QuestionStep
@@ -126,7 +153,9 @@ export function QuizApp() {
       case 'fit-comparison':
         return <FitComparisonStep step={step} locale={locale} answers={answers} />;
       case 'profile-summary':
-        return <ProfileSummaryStep step={step} locale={locale} answers={answers} />;
+        return (
+          <ProfileSummaryStep step={step} locale={locale} answers={answers} faceImage={faceImage} />
+        );
       case 'face-scan':
         return (
           <FaceScanStep
@@ -212,7 +241,9 @@ export function QuizApp() {
         ) : undefined
       }
     >
-      {renderStep()}
+      <QuizStepTransition stepKey={step.id} direction={transitionDirection}>
+        {renderStep()}
+      </QuizStepTransition>
     </QuizLayout>
   );
 }

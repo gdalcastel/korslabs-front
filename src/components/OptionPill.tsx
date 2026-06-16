@@ -50,3 +50,26 @@ export function SwatchPill({ option, locale, selected, onSelect, color }: Swatch
     </button>
   );
 }
+
+interface SwatchRowOptionProps {
+  option: QuizOption;
+  locale: Locale;
+  selected: boolean;
+  onSelect: () => void;
+  color?: string;
+}
+
+export function SwatchRowOption({ option, locale, selected, onSelect, color }: SwatchRowOptionProps) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={`swatch-row-option ${selected ? 'swatch-row-option-selected' : ''} ${color ? '' : 'swatch-row-option-text-only'}`}
+    >
+      {color && (
+        <span className="swatch-row-dot border border-black/5" style={{ backgroundColor: color }} aria-hidden />
+      )}
+      <span className="swatch-row-label">{t(option.label, locale)}</span>
+    </button>
+  );
+}

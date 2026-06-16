@@ -1,5 +1,7 @@
+import { FaceAreaCheckbox } from '@/components/FaceAreaCheckbox';
+import { FaceAreasDiagram } from '@/components/icons/FaceAreasDiagram';
 import { LikertScale } from '@/components/LikertScale';
-import { OptionPill, SwatchPill } from '@/components/OptionPill';
+import { OptionPill, SwatchRowOption } from '@/components/OptionPill';
 import { t } from '@/lib/i18n';
 import type { Locale, QuizAnswers, QuizStep } from '@/types/quiz';
 
@@ -16,7 +18,8 @@ export function QuestionStep({ step, locale, answers, onAnswer, onAutoAdvance }:
   if (!question) return null;
 
   const answer = answers[question.id];
-  const isSwatch = step.variant === 'swatch';
+  const isSwatchRow = step.variant === 'swatch-row';
+  const isFaceMap = step.variant === 'face-map';
 
   const handleSingle = (optionId: string) => {
     onAnswer(question.id, optionId);
@@ -50,24 +53,65 @@ export function QuestionStep({ step, locale, answers, onAnswer, onAutoAdvance }:
     );
   }
 
-  if (isSwatch) {
+  if (isSwatchRow) {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="quiz-title">{step.title ? t(step.title, locale) : t(question.title, locale)}</h1>
-          {step.subtitle && <p className="quiz-subtitle">{t(step.subtitle, locale)}</p>}
+          <h1 className="quiz-title">{t(question.title, locale)}</h1>
+          {(step.subtitle || question.subtitle) && (
+            <p className="quiz-subtitle">{t(step.subtitle ?? question.subtitle!, locale)}</p>
+          )}
         </div>
-        <div className="grid grid-cols-3 gap-3 sm:grid-cols-3">
+        <div className="space-y-3">
           {question.options.map((option) => (
-            <SwatchPill
+            <SwatchRowOption
               key={option.id}
               option={option}
               locale={locale}
               selected={answer === option.id}
               onSelect={() => handleSingle(option.id)}
-              color={option.meta?.hex as string}
+              color={option.meta?.hex as string | undefined}
             />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isFaceMap) {
+    const selected = ((answer as string[]) ?? []).slice();
+
+    const handleFaceAreaToggle = (optionId: string) => {
+      const current = selected.slice();
+      const idx = current.indexOf(optionId);
+      if (idx >= 0) current.splice(idx, 1);
+      else current.push(optionId);
+      onAnswer(question.id, current);
+    };
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="quiz-title">{t(question.title, locale)}</h1>
+          {step.subtitle && <p className="quiz-subtitle">{t(step.subtitle, locale)}</p>}
+        </div>
+
+        <div className="face-areas-layout">
+          <div className="face-areas-diagram">
+            <FaceAreasDiagram selected={selected} />
+          </div>
+
+          <div className="face-areas-options">
+            {question.options.map((option) => (
+              <FaceAreaCheckbox
+                key={option.id}
+                option={option}
+                locale={locale}
+                selected={selected.includes(option.id)}
+                onToggle={() => handleFaceAreaToggle(option.id)}
+              />
+            ))}
+          </div>
         </div>
       </div>
     );

@@ -100,6 +100,38 @@ export const quizSteps: QuizStep[] = [
           { id: 'pores', label: { en: 'Large pores', pt: 'Poros dilatados', es: 'Poros grandes' } },
         ],
       },
+    ],
+  },
+  {
+    id: 'community-trust',
+    section: 2,
+    kind: 'trust',
+    subtitle: {
+      en: "You're in good hands",
+      pt: 'Você está em boas mãos',
+      es: 'Estás en buenas manos',
+    },
+    title: {
+      en: "You're not alone!",
+      pt: 'Você não está sozinho(a)!',
+      es: '¡No estás solo(a)!',
+    },
+    body: {
+      en: 'KOR Labs has helped 23,428 people with similar concerns',
+      pt: 'A KOR Labs já ajudou 23.428 pessoas com preocupações semelhantes',
+      es: 'KOR Labs ha ayudado a 23.428 personas con preocupaciones similares',
+    },
+    cta: {
+      en: 'Next',
+      pt: 'Continuar',
+      es: 'Continuar',
+    },
+  },
+  {
+    id: 'skin-profile',
+    section: 2,
+    kind: 'questions',
+    questions: [
       {
         id: 'skin-type',
         type: 'single',
@@ -115,30 +147,34 @@ export const quizSteps: QuizStep[] = [
     ],
   },
   {
+    id: 'early-fit-preview',
+    section: 2,
+    kind: 'fit-preview',
+    cta: {
+      en: "Let's increase the fit!",
+      pt: 'Vamos aumentar a adequação!',
+      es: '¡Aumentemos el ajuste!',
+    },
+  },
+  {
     id: 'face-areas',
     section: 3,
     kind: 'questions',
-    title: {
-      en: 'Where on your face would you like to improve?',
-      pt: 'Onde no rosto você gostaria de melhorar?',
-      es: '¿Dónde en tu rostro te gustaría mejorar?',
-    },
     questions: [
       {
         id: 'face-areas',
         type: 'multi',
         title: {
-          en: 'Select all that apply',
-          pt: 'Selecione todas que se aplicam',
-          es: 'Selecciona todas las que apliquen',
+          en: 'Where on your face would you like to improve?',
+          pt: 'Onde no rosto você gostaria de melhorar?',
+          es: '¿Dónde en tu rostro te gustaría mejorar?',
         },
         options: [
-          { id: 'forehead', label: { en: 'Forehead', pt: 'Testa', es: 'Frente' } },
+          { id: 'whole-face', label: { en: 'Whole face', pt: 'Rosto inteiro', es: 'Rostro completo' } },
+          { id: 'eyes', label: { en: 'Eyes', pt: 'Olhos', es: 'Ojos' } },
           { id: 'cheeks', label: { en: 'Cheeks', pt: 'Bochechas', es: 'Mejillas' } },
-          { id: 'nose', label: { en: 'Nose', pt: 'Nariz', es: 'Nariz' } },
+          { id: 'under-nose', label: { en: 'Under nose', pt: 'Abaixo do nariz', es: 'Bajo la nariz' } },
           { id: 'chin', label: { en: 'Chin', pt: 'Queixo', es: 'Barbilla' } },
-          { id: 'under-eyes', label: { en: 'Under eyes', pt: 'Olheiras', es: 'Contorno de ojos' } },
-          { id: 'jawline', label: { en: 'Jawline', pt: 'Linha da mandíbula', es: 'Mandíbula' } },
         ],
       },
     ],
@@ -147,59 +183,67 @@ export const quizSteps: QuizStep[] = [
     id: 'skin-tone',
     section: 3,
     kind: 'questions',
-    title: {
-      en: 'Select your skin tone',
-      pt: 'Selecione seu tom de pele',
-      es: 'Selecciona tu tono de piel',
-    },
-    subtitle: {
-      en: 'Choose the swatch that best matches your natural skin colour.',
-      pt: 'Escolha a amostra que melhor corresponde à sua cor natural de pele.',
-      es: 'Elige la muestra que mejor coincida con tu color de piel natural.',
-    },
     questions: [
       {
         id: 'skin-tone',
         type: 'single',
         title: {
-          en: 'Skin tone',
-          pt: 'Tom de pele',
-          es: 'Tono de piel',
+          en: 'What is color closest to your skin tone?',
+          pt: 'Qual cor se aproxima mais do seu tom de pele?',
+          es: '¿Qué color se acerca más a tu tono de piel?',
+        },
+        subtitle: {
+          en: 'This helps us personalize SPF and skincare recommendations',
+          pt: 'Isso nos ajuda a personalizar recomendações de FPS e skincare',
+          es: 'Esto nos ayuda a personalizar recomendaciones de FPS y skincare',
         },
         options: [
-          { id: 'very-fair', label: { en: 'Very Fair', pt: 'Muito Clara', es: 'Muy Clara' }, meta: { hex: '#F5E6D8', undertone: 'cool' } },
-          { id: 'fair', label: { en: 'Fair', pt: 'Clara', es: 'Clara' }, meta: { hex: '#E8C9A8', undertone: 'cool' } },
-          { id: 'light', label: { en: 'Light', pt: 'Leve', es: 'Ligera' }, meta: { hex: '#D4A574', undertone: 'neutral' } },
-          { id: 'medium', label: { en: 'Medium', pt: 'Média', es: 'Media' }, meta: { hex: '#C68642', undertone: 'warm' } },
-          { id: 'tan', label: { en: 'Tan', pt: 'Morena', es: 'Morena' }, meta: { hex: '#A0622E', undertone: 'warm' } },
-          { id: 'deep', label: { en: 'Deep', pt: 'Escura', es: 'Oscura' }, meta: { hex: '#6B3E1F', undertone: 'warm' } },
+          { id: 'very-fair', label: { en: 'Very Fair', pt: 'Muito Clara', es: 'Muy Clara' }, meta: { hex: '#F5E6D8' } },
+          { id: 'fair', label: { en: 'Fair', pt: 'Clara', es: 'Clara' }, meta: { hex: '#E8C9A8' } },
+          { id: 'medium', label: { en: 'Medium', pt: 'Média', es: 'Media' }, meta: { hex: '#D4A574' } },
+          { id: 'brown', label: { en: 'Brown', pt: 'Morena', es: 'Morena' }, meta: { hex: '#A0622E' } },
+          { id: 'deep-brown', label: { en: 'Deep Brown', pt: 'Morena Escura', es: 'Morena Oscura' }, meta: { hex: '#6B3E1F' } },
+          { id: 'other', label: { en: 'Other', pt: 'Outro', es: 'Otro' } },
         ],
       },
     ],
   },
   {
-    id: 'undertone-info',
+    id: 'undertone',
     section: 3,
-    kind: 'info',
-    info: {
-      id: 'undertone-info',
-      type: 'info',
-      title: {
-        en: 'Understanding undertones',
-        pt: 'Entendendo subtons',
-        es: 'Entendiendo subtonos',
+    kind: 'questions',
+    questions: [
+      {
+        id: 'undertone',
+        type: 'single',
+        title: {
+          en: 'What is your undertone?',
+          pt: 'Qual é o seu subtom?',
+          es: '¿Cuál es tu subtono?',
+        },
+        subtitle: {
+          en: 'This helps us understand how your skin behaves and what it needs',
+          pt: 'Isso nos ajuda a entender como sua pele se comporta e o que ela precisa',
+          es: 'Esto nos ayuda a entender cómo se comporta tu piel y qué necesita',
+        },
+        options: [
+          { id: 'cool', label: { en: 'Cool', pt: 'Frio', es: 'Frío' }, meta: { hex: '#F0C4BC' } },
+          { id: 'neutral', label: { en: 'Neutral', pt: 'Neutro', es: 'Neutro' }, meta: { hex: '#D4B896' } },
+          { id: 'warm', label: { en: 'Warm', pt: 'Quente', es: 'Cálido' }, meta: { hex: '#E8A65B' } },
+          { id: 'olive', label: { en: 'Olive', pt: 'Oliva', es: 'Oliva' }, meta: { hex: '#B8A86E' } },
+          { id: 'not-sure', label: { en: 'Not sure', pt: 'Não tenho certeza', es: 'No estoy seguro(a)' } },
+        ],
       },
-      body: {
-        en: 'Your undertone is the underlying hue beneath your skin\'s surface — it can be cool (pink/blue), warm (yellow/golden/peach) or neutral (a mix of warm and cool). Undertone does not determine your tendency to develop spots: sun protection and daily care matter for everyone.',
-        pt: 'O subtom é a tonalidade de fundo que aparece sob a superfície da pele — pode ser frio (rosado/azulado), quente (amarelo/dourado/pêssego) ou neutro (mistura de quentes e frios). O subtom não determina a propensão a manchas: a proteção solar e os cuidados diários são importantes para todos os tipos.',
-        es: 'El subtono es la tonalidad de fondo que aparece bajo la superficie de la piel — puede ser frío (rosado/azulado), cálido (amarillo/dorado/melocotón) o neutro (mezcla de cálidos y fríos). El subtono no determina la propensión a manchas: la protección solar y el cuidado diario son importantes para todos.',
-      },
-      highlight: {
-        en: 'How we calculate: We infer your undertone from your selected skin shade combined with other characteristics (vein test, sun reaction) for a more accurate assessment.',
-        pt: 'Como calculamos: O subtom é inferido a partir da combinação da cor de pele escolhida e de outras características (teste das veias, reação ao sol), garantindo uma avaliação mais precisa.',
-        es: 'Cómo lo calculamos: Inferimos tu subtono a partir de la combinación del tono de piel elegido y otras características (prueba de venas, reacción al sol), garantizando una evaluación más precisa.',
-      },
-      image: 'undertone',
+    ],
+  },
+  {
+    id: 'skin-insight',
+    section: 3,
+    kind: 'skin-insight',
+    cta: {
+      en: 'Got it',
+      pt: 'Entendi',
+      es: 'Entendido',
     },
   },
   {
@@ -609,14 +653,9 @@ export const quizSteps: QuizStep[] = [
     section: 8,
     kind: 'profile-summary',
     title: {
-      en: 'Your skin profile',
-      pt: 'Seu perfil de pele',
-      es: 'Tu perfil de piel',
-    },
-    subtitle: {
-      en: 'Based on your lifestyle answers, here is what we found.',
-      pt: 'Com base nas suas respostas de estilo de vida, aqui está o que encontramos.',
-      es: 'Según tus respuestas de estilo de vida, esto es lo que encontramos.',
+      en: 'Your profile is ready',
+      pt: 'Seu perfil está pronto',
+      es: 'Tu perfil está listo',
     },
   },
   {

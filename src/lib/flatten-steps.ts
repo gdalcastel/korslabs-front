@@ -16,7 +16,12 @@ function expandQuestionStep(step: QuizStep, question: QuizQuestion): QuizStep {
     title: question.title,
     subtitle,
     question,
-    variant: step.id === 'skin-tone' ? 'swatch' : undefined,
+    variant:
+      step.id === 'skin-tone' || question.id === 'undertone'
+        ? 'swatch-row'
+        : question.id === 'face-areas'
+          ? 'face-map'
+          : undefined,
   };
 }
 

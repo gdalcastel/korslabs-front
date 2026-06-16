@@ -29,9 +29,14 @@ export const questionSubtitles: Record<string, LocalizedText> = {
     es: 'Selecciona todas las áreas que te gustaría mejorar.',
   },
   'skin-tone': {
-    en: 'Choose the swatch that best matches your natural skin colour.',
-    pt: 'Escolha a amostra que melhor corresponde à sua cor natural de pele.',
-    es: 'Elige la muestra que mejor coincida con tu color de piel natural.',
+    en: 'This helps us personalize SPF and skincare recommendations',
+    pt: 'Isso nos ajuda a personalizar recomendações de FPS e skincare',
+    es: 'Esto nos ayuda a personalizar recomendaciones de FPS y skincare',
+  },
+  undertone: {
+    en: 'This helps us understand how your skin behaves and what it needs',
+    pt: 'Isso nos ajuda a entender como sua pele se comporta e o que ela precisa',
+    es: 'Esto nos ayuda a entender cómo se comporta tu piel y qué necesita',
   },
   'has-routine': {
     en: 'Consistency is key to visible results.',

@@ -1,27 +1,35 @@
 import type { QuizAnswers, SkincarePlan, SkinProfile } from '@/types/quiz';
+import { getSkinToneMeta, legacyToneMap, resolveProfileUndertone } from '@/lib/skin-tone-data';
 
 const toneMap: Record<string, { label: string; undertone: 'cool' | 'neutral' | 'warm' }> = {
   'very-fair': { label: 'very-fair', undertone: 'cool' },
   fair: { label: 'fair', undertone: 'cool' },
-  light: { label: 'light', undertone: 'neutral' },
-  medium: { label: 'medium', undertone: 'warm' },
-  tan: { label: 'tan', undertone: 'warm' },
-  deep: { label: 'deep', undertone: 'warm' },
+  medium: { label: 'medium', undertone: 'neutral' },
+  brown: { label: 'brown', undertone: 'warm' },
+  'deep-brown': { label: 'deep-brown', undertone: 'warm' },
+  other: { label: 'medium', undertone: 'neutral' },
+  light: { label: 'medium', undertone: 'neutral' },
+  tan: { label: 'brown', undertone: 'warm' },
+  deep: { label: 'deep-brown', undertone: 'warm' },
 };
 
 const toneLabels = {
   'very-fair': { en: 'Very Fair', pt: 'Muito Clara', es: 'Muy Clara' },
   fair: { en: 'Fair', pt: 'Clara', es: 'Clara' },
-  light: { en: 'Light', pt: 'Leve', es: 'Ligera' },
   medium: { en: 'Medium', pt: 'Média', es: 'Media' },
-  tan: { en: 'Tan', pt: 'Morena', es: 'Morena' },
-  deep: { en: 'Deep', pt: 'Escura', es: 'Oscura' },
+  brown: { en: 'Brown', pt: 'Morena', es: 'Morena' },
+  'deep-brown': { en: 'Deep Brown', pt: 'Morena Escura', es: 'Morena Oscura' },
+  other: { en: 'Other', pt: 'Outro', es: 'Otro' },
+  light: { en: 'Medium', pt: 'Média', es: 'Media' },
+  tan: { en: 'Brown', pt: 'Morena', es: 'Morena' },
+  deep: { en: 'Deep Brown', pt: 'Morena Escura', es: 'Morena Oscura' },
 };
 
 const undertoneLabels = {
   cool: { en: 'Cool', pt: 'Frio', es: 'Frío' },
   neutral: { en: 'Neutral', pt: 'Neutro', es: 'Neutro' },
   warm: { en: 'Warm', pt: 'Quente', es: 'Cálido' },
+  olive: { en: 'Olive', pt: 'Oliva', es: 'Oliva' },
 };
 
 function scoreLifestyle(answers: QuizAnswers): number {
@@ -70,6 +78,16 @@ function computeIngredientsFit(answers: QuizAnswers): number {
   if (answers.acids === 'regular') fit += 12;
   if (answers.sulfates === 'avoid') fit += 8;
   return Math.max(15, Math.min(96, fit));
+}
+
+export function computeEarlyProgramFit(answers: QuizAnswers): number {
+  let fit = 38;
+  if (answers['skin-type']) fit += 5;
+  if (answers.gender) fit += 2;
+  if (answers.age) fit += 2;
+  const concerns = (answers['skin-concerns'] as string[]) ?? [];
+  fit += Math.min(concerns.length * 2, 10);
+  return Math.max(35, Math.min(55, fit));
 }
 
 function getSkinTypeLabel(answers: QuizAnswers, score: number) {
@@ -131,8 +149,10 @@ function getInterpretation(answers: QuizAnswers, score: number) {
 }
 
 export function buildProfile(answers: QuizAnswers): SkinProfile {
-  const toneKey = (answers['skin-tone'] as string) ?? 'medium';
+  const rawToneKey = (answers['skin-tone'] as string) ?? 'medium';
+  const toneKey = legacyToneMap[rawToneKey] ?? rawToneKey;
   const tone = toneMap[toneKey] ?? toneMap.medium;
+  const undertone = resolveProfileUndertone(answers.undertone as string | undefined, rawToneKey);
   const lifestyleScore = scoreLifestyle(answers);
   const programFit = computeProgramFit(answers);
   const ingredientsFit = computeIngredientsFit(answers);
@@ -142,8 +162,8 @@ export function buildProfile(answers: QuizAnswers): SkinProfile {
     : Math.min(85, 58 + Math.floor(lifestyleScore / 12));
 
   return {
-    skinTone: toneLabels[tone.label as keyof typeof toneLabels]?.en ?? 'Medium',
-    undertone: tone.undertone,
+    skinTone: toneLabels[tone.label as keyof typeof toneLabels]?.en ?? getSkinToneMeta(rawToneKey).label.en,
+    undertone,
     confidenceScore,
     skinTypeLabel: getSkinTypeLabel(answers, lifestyleScore),
     lifestyleScore,
