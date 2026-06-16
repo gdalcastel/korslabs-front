@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { FaceCaptureCamera } from '@/components/face/FaceCaptureCamera';
-import { t } from '@/lib/i18n';
-import type { Locale, QuizStep } from '@/types/quiz';
+import { FaceScanAnimation } from '@/components/face/FaceScanAnimation';
+import type { Locale } from '@/types/quiz';
 
 interface FaceScanStepProps {
-  step: QuizStep;
   locale: Locale;
   faceImage: string | null;
   onImage: (dataUrl: string) => void;
   onComplete: () => void;
 }
 
-export function FaceScanStep({ step, locale, faceImage, onImage, onComplete }: FaceScanStepProps) {
+const SKIN_ANALYSIS_MS = 2400;
+
+export function FaceScanStep({ locale, faceImage, onImage, onComplete }: FaceScanStepProps) {
   const [analysing, setAnalysing] = useState(false);
 
   const handleCapture = (dataUrl: string) => {
@@ -20,32 +21,16 @@ export function FaceScanStep({ step, locale, faceImage, onImage, onComplete }: F
     setTimeout(() => {
       setAnalysing(false);
       onComplete();
-    }, 2800);
+    }, SKIN_ANALYSIS_MS);
   };
 
   return (
-    <div className="face-scan-step space-y-6">
-      <h1 className="quiz-title">{step.title && t(step.title, locale)}</h1>
-      <p className="quiz-subtitle">{step.subtitle && t(step.subtitle, locale)}</p>
-
+    <div className="face-scan-step face-scan-step--immersive">
       {!faceImage && !analysing && <FaceCaptureCamera locale={locale} onCapture={handleCapture} />}
 
-      {faceImage && (
-        <div className="face-capture-viewport">
-          <img src={faceImage} alt="Face scan" />
-          {analysing && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
-              <div className="h-16 w-16 animate-pulse rounded-full border-4 border-white/30 border-t-white" />
-              <p className="mt-4 text-sm font-medium text-white">
-                {locale === 'pt'
-                  ? 'Analisando sua pele...'
-                  : locale === 'es'
-                    ? 'Analizando tu piel...'
-                    : 'Analysing your skin...'}
-              </p>
-              <div className="absolute inset-x-8 top-1/2 h-0.5 animate-pulse bg-quiz-accent" />
-            </div>
-          )}
+      {faceImage && analysing && (
+        <div className="face-capture-fullscreen">
+          <FaceScanAnimation imageSrc={faceImage} locale={locale} variant="skin" />
         </div>
       )}
     </div>

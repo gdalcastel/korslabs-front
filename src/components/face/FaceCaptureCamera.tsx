@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import { FaceScanAnimation } from '@/components/face/FaceScanAnimation';
 import { UiIcon } from '@/components/icons/UiIcons';
 import { useFaceDetector } from '@/hooks/useFaceDetector';
 import {
-  FACE_OVAL,
+  FACE_CONTOUR_PATH,
   getPrimaryValidationHint,
   measureBrightness,
   measureSharpness,
@@ -17,12 +18,15 @@ interface FaceCaptureCameraProps {
 }
 
 type CameraState = 'loading' | 'active' | 'denied' | 'unsupported';
+type CaptureState = 'live' | 'scanning';
+
+const SCAN_DURATION_MS = 2800;
 
 const HINTS: Record<FaceValidationIssue, Record<Locale, string>> = {
   'no-face': {
-    pt: 'Posicione seu rosto dentro do oval',
-    es: 'Coloca tu rostro dentro del óvalo',
-    en: 'Position your face inside the oval',
+    pt: 'Posicione seu rosto dentro do contorno',
+    es: 'Coloca tu rostro dentro del contorno',
+    en: 'Position your face inside the outline',
   },
   'multiple-faces': {
     pt: 'Apenas uma pessoa deve aparecer na foto',
@@ -30,9 +34,9 @@ const HINTS: Record<FaceValidationIssue, Record<Locale, string>> = {
     en: 'Only one person should appear in the photo',
   },
   'face-off-center': {
-    pt: 'Centralize seu rosto no oval',
-    es: 'Centra tu rostro en el óvalo',
-    en: 'Center your face in the oval',
+    pt: 'Centralize seu rosto no contorno',
+    es: 'Centra tu rostro en el contorno',
+    en: 'Center your face in the outline',
   },
   'face-too-small': {
     pt: 'Aproxime-se um pouco mais da câmera',
@@ -73,9 +77,9 @@ const UI: Record<string, Record<Locale, string>> = {
     en: 'Preparing face verification...',
   },
   instruction: {
-    pt: 'Encaixe seu rosto no oval e mantenha boa iluminação',
-    es: 'Encaja tu rostro en el óvalo y mantén buena iluminación',
-    en: 'Fit your face in the oval and keep good lighting',
+    pt: 'Encaixe seu rosto no contorno e toque para capturar',
+    es: 'Encaja tu rostro en el contorno y toca para capturar',
+    en: 'Fit your face in the outline and tap to capture',
   },
   ready: {
     pt: 'Perfeito! Toque para capturar',
@@ -109,32 +113,25 @@ const UI: Record<string, Record<Locale, string>> = {
   },
 };
 
-function FaceOvalOverlay({ ready }: { ready: boolean }) {
+function FaceContourOverlay({ ready, maskId }: { ready: boolean; maskId: string }) {
   return (
     <div className="pointer-events-none absolute inset-0">
-      <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
+      <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" aria-hidden>
         <defs>
-          <mask id="face-oval-mask">
+          <mask id={maskId}>
             <rect width="100" height="100" fill="white" />
-            <ellipse
-              cx={FACE_OVAL.cx * 100}
-              cy={FACE_OVAL.cy * 100}
-              rx={FACE_OVAL.rx * 100}
-              ry={FACE_OVAL.ry * 100}
-              fill="black"
-            />
+            <path d={FACE_CONTOUR_PATH} fill="black" />
           </mask>
         </defs>
-        <rect width="100" height="100" fill="rgba(0,0,0,0.55)" mask="url(#face-oval-mask)" />
-        <ellipse
-          cx={FACE_OVAL.cx * 100}
-          cy={FACE_OVAL.cy * 100}
-          rx={FACE_OVAL.rx * 100}
-          ry={FACE_OVAL.ry * 100}
+        <rect width="100" height="100" fill="rgba(0,0,0,0.55)" mask={`url(#${maskId})`} />
+        <path
+          d={FACE_CONTOUR_PATH}
           fill="none"
-          stroke={ready ? '#5B54FF' : 'rgba(255,255,255,0.85)'}
-          strokeWidth="0.6"
-          strokeDasharray={ready ? '0' : '2 1.5'}
+          stroke={ready ? '#222222' : 'rgba(255,255,255,0.85)'}
+          strokeWidth="0.55"
+          strokeDasharray={ready ? '0' : '1.8 1.4'}
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
       </svg>
     </div>
@@ -142,16 +139,20 @@ function FaceOvalOverlay({ ready }: { ready: boolean }) {
 }
 
 export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps) {
+  const maskId = useId().replace(/:/g, '');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
   const lastCheckRef = useRef(0);
+  const scanStartedAtRef = useRef<number | null>(null);
 
   const { ready: detectorReady, error: detectorError, detectFaces } = useFaceDetector();
   const [cameraState, setCameraState] = useState<CameraState>('loading');
+  const [captureState, setCaptureState] = useState<CaptureState>('live');
   const [hint, setHint] = useState<FaceValidationIssue | 'ready' | null>(null);
   const [canCapture, setCanCapture] = useState(false);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
 
   const stopCamera = useCallback(() => {
     if (rafRef.current !== null) {
@@ -165,6 +166,10 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
   const startCamera = useCallback(async () => {
     stopCamera();
     setCameraState('loading');
+    setCaptureState('live');
+    setCapturedImage(null);
+    setHint(null);
+    setCanCapture(false);
 
     if (!navigator.mediaDevices?.getUserMedia) {
       setCameraState('unsupported');
@@ -199,7 +204,7 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
   }, [startCamera, stopCamera]);
 
   useEffect(() => {
-    if (cameraState !== 'active' || !detectorReady) return;
+    if (cameraState !== 'active' || !detectorReady || captureState !== 'live') return;
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -247,15 +252,36 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
     return () => {
       if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
     };
-  }, [cameraState, detectorReady, detectFaces]);
+  }, [cameraState, detectorReady, detectFaces, captureState]);
 
-  const handleCapture = () => {
+  useEffect(() => {
+    if (captureState !== 'scanning' || !capturedImage || scanStartedAtRef.current === null) return;
+
+    let cancelled = false;
+
+    const finishScan = async () => {
+      const elapsed = performance.now() - scanStartedAtRef.current!;
+      const remaining = Math.max(0, SCAN_DURATION_MS - elapsed);
+      await new Promise((resolve) => setTimeout(resolve, remaining));
+
+      if (cancelled) return;
+      onCapture(capturedImage);
+    };
+
+    void finishScan();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [captureState, capturedImage, onCapture]);
+
+  const captureFrame = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    if (!video || !canvas || !canCapture) return;
+    if (!video || !canvas || video.videoWidth === 0) return null;
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) return null;
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -265,19 +291,19 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
     ctx.drawImage(video, 0, 0);
     ctx.restore();
 
-    const faces = detectFaces(video, performance.now());
-    const brightness = measureBrightness(ctx, canvas.width, canvas.height);
-    const sharpness = measureSharpness(ctx, canvas.width, canvas.height);
-    const result = validateFaceCapture(faces, canvas.width, canvas.height, brightness, sharpness);
+    return canvas.toDataURL('image/jpeg', 0.92);
+  };
 
-    if (!result.valid) {
-      setHint(getPrimaryValidationHint(result.issues));
-      setCanCapture(false);
-      return;
-    }
+  const handleCapture = () => {
+    if (cameraState !== 'active' || captureState !== 'live') return;
+
+    const dataUrl = captureFrame();
+    if (!dataUrl) return;
 
     stopCamera();
-    onCapture(canvas.toDataURL('image/jpeg', 0.92));
+    scanStartedAtRef.current = performance.now();
+    setCapturedImage(dataUrl);
+    setCaptureState('scanning');
   };
 
   if (cameraState === 'denied' || cameraState === 'unsupported' || detectorError) {
@@ -287,17 +313,28 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
         : UI.denied[locale];
 
     return (
-      <div className="space-y-4 rounded-airbnb-lg border border-deco bg-white p-8 text-center shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-        <p className="text-[15px] font-medium text-hof">{message}</p>
-        {cameraState === 'denied' && (
-          <button
-            type="button"
-            onClick={startCamera}
-            className="rounded-pill bg-quiz-accent px-6 py-3 text-sm font-semibold text-white"
-          >
-            {UI.retry[locale]}
-          </button>
-        )}
+      <div className="face-capture-fullscreen flex items-center justify-center px-6">
+        <div className="w-full max-w-sm space-y-4 rounded-airbnb-lg border border-white/10 bg-white/95 p-8 text-center shadow-[0_2px_12px_rgba(0,0,0,0.2)]">
+          <p className="text-[15px] font-medium text-hof">{message}</p>
+          {cameraState === 'denied' && (
+            <button
+              type="button"
+              onClick={startCamera}
+              className="rounded-pill bg-quiz-accent px-6 py-3 text-sm font-semibold text-gold"
+            >
+              {UI.retry[locale]}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (captureState === 'scanning' && capturedImage) {
+    return (
+      <div className="face-capture-fullscreen">
+        <FaceScanAnimation imageSrc={capturedImage} locale={locale} />
+        <canvas ref={canvasRef} className="hidden" aria-hidden />
       </div>
     );
   }
@@ -309,53 +346,49 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
         ? HINTS[hint][locale]
         : UI.instruction[locale];
 
-  const isLoading = cameraState === 'loading' || !detectorReady;
+  const isCameraLoading = cameraState === 'loading';
+  const isDetectorLoading = cameraState === 'active' && !detectorReady;
+  const canPressCapture = cameraState === 'active' && captureState === 'live';
 
   return (
-    <div className="space-y-4">
-      <div className="face-capture-viewport">
-        <video ref={videoRef} playsInline muted autoPlay />
+    <div className="face-capture-fullscreen">
+      <video ref={videoRef} playsInline muted autoPlay className="face-capture-video" />
 
-        <FaceOvalOverlay ready={canCapture} />
+      <FaceContourOverlay ready={canCapture} maskId={maskId} />
 
-        {isLoading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white" />
-            <p className="mt-4 px-6 text-center text-sm font-medium text-white">
-              {cameraState === 'loading' ? UI.loadingCamera[locale] : UI.loadingDetector[locale]}
-            </p>
-          </div>
-        )}
-
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-5 pb-5 pt-10">
-          <p
-            className={`text-center text-sm font-medium ${canCapture ? 'text-[#9BF0E1]' : 'text-white'}`}
-          >
-            {hintText}
+      {isCameraLoading && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white" />
+          <p className="mt-4 px-6 text-center text-sm font-medium text-white">
+            {UI.loadingCamera[locale]}
           </p>
         </div>
-      </div>
+      )}
 
-      <canvas ref={canvasRef} className="hidden" aria-hidden />
+      <div className="face-capture-overlay-bottom">
+        <p
+          className={`text-center text-sm font-medium ${canCapture ? 'text-[#9BF0E1]' : 'text-white'}`}
+        >
+          {isDetectorLoading ? UI.loadingDetector[locale] : hintText}
+        </p>
 
-      <div className="flex flex-col items-center gap-3 mx-auto w-full max-w-[360px]">
         <button
           type="button"
           onClick={handleCapture}
-          disabled={!canCapture}
+          disabled={!canPressCapture}
           aria-label={UI.capture[locale]}
-          className="relative flex h-[72px] w-[72px] items-center justify-center rounded-full border-4 border-white bg-white/10 shadow-airbnb transition enabled:active:scale-95 disabled:opacity-40"
+          className="relative mt-4 flex h-[72px] w-[72px] touch-manipulation items-center justify-center rounded-full border-4 border-white bg-white/10 shadow-airbnb transition enabled:active:scale-95 disabled:opacity-40"
         >
-          <span
-            className={`h-14 w-14 rounded-full ${canCapture ? 'bg-white' : 'bg-white/50'}`}
-          />
+          <span className={`h-14 w-14 rounded-full ${canCapture ? 'bg-white' : 'bg-white/80'}`} />
         </button>
 
-        <p className="flex items-center justify-center gap-2 text-center text-xs text-[#717171]">
+        <p className="mt-3 flex items-center justify-center gap-2 text-center text-xs text-white/70">
           <UiIcon name="lock" size={14} />
           {UI.private[locale]}
         </p>
       </div>
+
+      <canvas ref={canvasRef} className="hidden" aria-hidden />
     </div>
   );
 }

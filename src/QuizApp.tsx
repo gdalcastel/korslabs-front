@@ -86,7 +86,13 @@ export function QuizApp() {
   }, [setAnswer, computeResults, nextStep]);
 
   const layoutVariant =
-    step.kind === 'welcome' ? 'welcome' : step.kind === 'results' ? 'results' : 'quiz';
+    step.kind === 'welcome'
+      ? 'welcome'
+      : step.kind === 'results'
+        ? 'results'
+        : step.kind === 'face-scan'
+          ? 'face-scan'
+          : 'quiz';
 
   const showFooter = step.kind !== 'results' && step.kind !== 'face-scan' && needsContinueButton;
 
@@ -122,7 +128,6 @@ export function QuizApp() {
       case 'face-scan':
         return (
           <FaceScanStep
-            step={step}
             locale={locale}
             faceImage={faceImage}
             onImage={setFaceImage}
@@ -160,7 +165,11 @@ export function QuizApp() {
       phase={phase}
       phaseProgress={phaseProgress}
       showProgress={step.kind !== 'welcome' && step.kind !== 'results'}
-      headerExtra={<LocaleSwitcher locale={locale} onChange={setLocale} compact />}
+      headerExtra={
+        step.kind === 'welcome' ? (
+          <LocaleSwitcher locale={locale} onChange={setLocale} compact />
+        ) : undefined
+      }
       footer={
         showFooter ? (
           <div className="btn-primary-wrap">

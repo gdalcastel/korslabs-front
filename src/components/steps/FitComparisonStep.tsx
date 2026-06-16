@@ -34,7 +34,7 @@ export function FitComparisonStep({ step, locale, answers }: FitComparisonStepPr
         <FitBar
           label={locale === 'pt' ? 'Adequação do Programa' : locale === 'es' ? 'Ajuste del Programa' : 'Program Fit'}
           value={profile.programFit}
-          color="#5B54FF"
+          color="#222222"
         />
         <FitBar
           label={locale === 'pt' ? 'Adequação dos Ingredientes' : locale === 'es' ? 'Ajuste de Ingredientes' : 'Ingredients Fit'}

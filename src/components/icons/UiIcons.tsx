@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-const accent = '#5B54FF';
+const accent = '#222222';
 
 export type UiIconName =
   | 'location'
@@ -84,7 +84,7 @@ export function IconBadge({ children, size = 'md' }: IconBadgeProps) {
   };
 
   return (
-    <span className={`icon-badge inline-flex shrink-0 items-center justify-center border border-white shadow-[0_4px_16px_rgba(91,84,255,0.1)] ${sizes[size]}`}>
+    <span className={`icon-badge inline-flex shrink-0 items-center justify-center border border-white shadow-[0_4px_16px_rgba(0,0,0,0.08)] ${sizes[size]}`}>
       {children}
     </span>
   );

@@ -9,7 +9,7 @@ interface QuizLayoutProps {
   headerExtra?: ReactNode;
   onBack?: () => void;
   showBack?: boolean;
-  variant?: 'welcome' | 'quiz' | 'results';
+  variant?: 'welcome' | 'quiz' | 'results' | 'face-scan';
   phase?: QuizPhase;
   phaseProgress?: number;
   showProgress?: boolean;
@@ -27,10 +27,12 @@ export function QuizLayout({
   showProgress = true,
 }: QuizLayoutProps) {
   const isWelcome = variant === 'welcome';
+  const isFaceScan = variant === 'face-scan';
 
   return (
-    <div className="quiz-page">
-      <div className="quiz-shell">
+    <div className={`quiz-page ${isFaceScan ? 'quiz-page-face-scan' : ''}`}>
+      <div className={`quiz-shell ${isFaceScan ? 'quiz-shell-face-scan' : ''}`}>
+        {!isFaceScan && (
         <header className={`quiz-header ${isWelcome ? 'quiz-header-welcome' : ''}`}>
           {isWelcome && headerExtra && (
             <div className="mb-2 flex justify-end">{headerExtra}</div>
@@ -68,8 +70,13 @@ export function QuizLayout({
             </div>
           )}
         </header>
+        )}
 
-        <main className={`quiz-content ${footer ? 'quiz-content-with-footer' : ''}`}>{children}</main>
+        <main
+          className={`quiz-content ${isFaceScan ? 'quiz-content-face-scan' : ''} ${footer ? 'quiz-content-with-footer' : ''}`}
+        >
+          {children}
+        </main>
 
         {footer && <footer className="quiz-footer safe-bottom">{footer}</footer>}
       </div>

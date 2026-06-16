@@ -29,6 +29,10 @@ export const FACE_OVAL: OvalGuide = {
   ry: 0.28,
 };
 
+/** Contorno de rosto (viewBox 0 0 100 100) alinhado ao guia de validação. */
+export const FACE_CONTOUR_PATH =
+  'M50 12 C64 12 76 18 82 30 C87 42 87 54 83 66 C78 78 70 88 58 93 C54 95 50 96 46 95 C34 90 26 80 21 68 C17 56 17 44 21 32 C26 20 36 12 50 12 Z';
+
 const MIN_BRIGHTNESS = 55;
 const MAX_BRIGHTNESS = 210;
 const MIN_SHARPNESS = 80;

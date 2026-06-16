@@ -14,9 +14,10 @@ export default {
         bobo: '#B0B0B0',
         deco: '#DDDDDD',
         arches: '#C13515',
+        gold: '#C9A962',
         quiz: {
-          accent: '#5B54FF',
-          'accent-dark': '#3D36E8',
+          accent: '#222222',
+          'accent-dark': '#000000',
         },
       },
       borderRadius: {
@@ -29,7 +30,7 @@ export default {
         'airbnb-hover': '0 6px 20px rgba(0, 0, 0, 0.15)',
       },
       backgroundImage: {
-        'quiz-gradient': 'linear-gradient(90deg, #3D36E8 0%, #5B54FF 50%, #6B63FF 100%)',
+        'quiz-gradient': 'linear-gradient(90deg, #111111 0%, #222222 50%, #333333 100%)',
       },
       maxWidth: {
         mobile: '480px',
