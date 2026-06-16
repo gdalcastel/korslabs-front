@@ -53,19 +53,24 @@ export function WelcomeStep({ step, locale }: WelcomeStepProps) {
         <KorLogo variant="welcome" />
       </div>
 
-      <div className="welcome-hero-image mx-auto mb-8 w-full max-w-[360px]">
-        <img
-          src="/welcome-skin-analysis.jpg"
-          alt={
-            locale === 'pt'
-              ? 'Análise de pele com IA — hidratação, rugas, manchas, elasticidade, textura e barreira cutânea'
-              : locale === 'es'
-                ? 'Análisis de piel con IA — hidratación, arrugas, manchas, elasticidad, textura y barrera cutánea'
-                : 'AI-powered skin analysis — hydration, wrinkles, dark spots, elasticity, texture and skin barrier'
-          }
-          className="h-auto w-full object-contain"
-          draggable={false}
-        />
+      <div className="welcome-hero-image mx-auto mb-8 w-full max-w-[360px] md:max-w-[480px] lg:max-w-[520px]">
+        <picture>
+          <source type="image/webp" srcSet="/welcome-skin-analysis.webp" />
+          <img
+            src="/welcome-skin-analysis.png"
+            srcSet="/welcome-skin-analysis.png 1024w"
+            sizes="(min-width: 1024px) 520px, (min-width: 768px) 480px, 360px"
+            alt={
+              locale === 'pt'
+                ? 'Análise de pele com IA — hidratação, rugas, manchas, elasticidade, textura e barreira cutânea'
+                : locale === 'es'
+                  ? 'Análisis de piel con IA — hidratación, arrugas, manchas, elasticidad, textura y barrera cutánea'
+                  : 'AI-powered skin analysis — hydration, wrinkles, dark spots, elasticity, texture and skin barrier'
+            }
+            className="h-auto w-full object-contain"
+            draggable={false}
+          />
+        </picture>
       </div>
 
       <h1 className="quiz-title text-[28px] leading-[1.15]">{step.title && t(step.title, locale)}</h1>
