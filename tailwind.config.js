@@ -9,7 +9,7 @@ export default {
       colors: {
         rausch: '#FF385C',
         'rausch-dark': '#E31C5F',
-        foggy: '#F7F7F7',
+        foggy: '#F9F9F9',
         hof: '#222222',
         bobo: '#B0B0B0',
         deco: '#DDDDDD',

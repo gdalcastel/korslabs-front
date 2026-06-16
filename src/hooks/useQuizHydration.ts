@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { quizSteps } from '@/lib/flatten-steps';
+import { detectLocale } from '@/lib/i18n';
 import { getStepIndexFromUrl } from '@/lib/quiz-url';
 import { useQuizStore } from '@/store/quiz-store';
 
@@ -20,6 +21,15 @@ export function useQuizHydration(): boolean {
 
       if (step?.kind === 'results' && (!profile || !plan) && Object.keys(answers).length > 0) {
         state.computeResults();
+      }
+
+      if (!state.localeManual) {
+        detectLocale().then((detected) => {
+          const current = useQuizStore.getState();
+          if (!current.localeManual && current.locale !== detected) {
+            current.setLocale(detected);
+          }
+        });
       }
 
       setHydrated(true);

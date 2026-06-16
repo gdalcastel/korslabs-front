@@ -194,7 +194,7 @@ export function QuizApp() {
       showProgress={step.kind !== 'welcome' && step.kind !== 'results'}
       headerExtra={
         step.kind === 'welcome' ? (
-          <LocaleSwitcher locale={locale} onChange={setLocale} compact />
+          <LocaleSwitcher locale={locale} onChange={(l) => setLocale(l, true)} compact />
         ) : undefined
       }
       footer={

@@ -79,13 +79,14 @@ export interface QuizAnswers {
 
 export interface QuizState {
   locale: Locale;
+  localeManual: boolean;
   currentStepIndex: number;
   answers: QuizAnswers;
   environment: EnvironmentData | null;
   faceImage: string | null;
   profile: SkinProfile | null;
   plan: SkincarePlan | null;
-  setLocale: (locale: Locale) => void;
+  setLocale: (locale: Locale, manual?: boolean) => void;
   setAnswer: (questionId: string, value: string | string[] | number) => void;
   nextStep: () => void;
   prevStep: () => void;

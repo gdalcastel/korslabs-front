@@ -3,11 +3,13 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { quizSteps } from '@/lib/flatten-steps';
 import { buildPlan, buildProfile } from '@/lib/quiz-engine';
 import { getInitialStepIndex, updateQuizStepUrl } from '@/lib/quiz-url';
+import { detectLocaleFromBrowser } from '@/lib/i18n';
 import { clearQuizStorage, QUIZ_STORAGE_KEY } from '@/lib/quiz-storage';
-import type { EnvironmentData, QuizState, Locale } from '@/types/quiz';
+import type { EnvironmentData, QuizState } from '@/types/quiz';
 
 const baseState = {
-  locale: 'pt' as Locale,
+  locale: detectLocaleFromBrowser(),
+  localeManual: false,
   currentStepIndex: getInitialStepIndex(),
   answers: {} as QuizState['answers'],
   environment: null as EnvironmentData | null,
@@ -21,7 +23,11 @@ export const useQuizStore = create<QuizState>()(
     (set, get) => ({
       ...baseState,
 
-      setLocale: (locale) => set({ locale }),
+      setLocale: (locale, manual = false) =>
+        set((state) => ({
+          locale,
+          localeManual: manual ? true : state.localeManual,
+        })),
 
       setAnswer: (questionId, value) =>
         set((state) => ({
@@ -73,7 +79,8 @@ export const useQuizStore = create<QuizState>()(
 
       reset: () => {
         clearQuizStorage();
-        set({ ...baseState, currentStepIndex: 0, faceImage: null });
+        const { locale, localeManual } = get();
+        set({ ...baseState, locale, localeManual, currentStepIndex: 0, faceImage: null });
         updateQuizStepUrl(0);
       },
     }),
@@ -82,6 +89,7 @@ export const useQuizStore = create<QuizState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         locale: state.locale,
+        localeManual: state.localeManual,
         answers: state.answers,
         environment: state.environment,
         profile: state.profile,
