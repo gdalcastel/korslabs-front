@@ -261,6 +261,9 @@
 
   .face-capture-video {
     @apply absolute inset-0 h-full w-full object-cover;
+  }
+
+  .face-capture-video--live {
     transform: scaleX(-1);
   }
 

@@ -161,6 +161,57 @@ export function validateFaceCapture(
   };
 }
 
+/** Validação pós-captura: rosto humano único, nitidez e iluminação. */
+export function validateCapturedPhoto(
+  faces: DetectedFaceBox[],
+  canvasWidth: number,
+  canvasHeight: number,
+  brightness: number,
+  sharpness: number,
+): FaceValidationResult {
+  const issues: FaceValidationIssue[] = [];
+
+  if (faces.length === 0) {
+    issues.push('no-face');
+  } else if (faces.length > 1) {
+    issues.push('multiple-faces');
+  } else {
+    const face = faces[0];
+    const faceWidthRatio = face.width / canvasWidth;
+    const faceHeightRatio = face.height / canvasHeight;
+
+    if (faceWidthRatio < 0.15 || faceHeightRatio < 0.12) {
+      issues.push('face-too-small');
+    }
+  }
+
+  if (brightness < MIN_BRIGHTNESS) {
+    issues.push('too-dark');
+  }
+  if (brightness > MAX_BRIGHTNESS) {
+    issues.push('too-bright');
+  }
+  if (sharpness < MIN_SHARPNESS) {
+    issues.push('blurry');
+  }
+
+  return {
+    valid: issues.length === 0,
+    issues,
+    brightness,
+    sharpness,
+  };
+}
+
+export function loadImageFromDataUrl(dataUrl: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
+}
+
 export function getPrimaryValidationHint(issues: FaceValidationIssue[]): FaceValidationIssue | null {
   const priority: FaceValidationIssue[] = [
     'no-face',

@@ -22,6 +22,32 @@ const PHASE_TEXT: Record<ScanPhase, Record<Locale, string>> = {
   },
 };
 
+const SKIN_ANALYSIS_PHRASES: Record<Locale, string[]> = {
+  pt: [
+    'Analisando sua pele...',
+    'Identificando textura...',
+    'Mapeando hidratação...',
+    'Avaliando oleosidade...',
+    'Preparando seu perfil...',
+  ],
+  es: [
+    'Analizando tu piel...',
+    'Identificando textura...',
+    'Mapeando hidratación...',
+    'Evaluando oleosidad...',
+    'Preparando tu perfil...',
+  ],
+  en: [
+    'Analysing your skin...',
+    'Identifying texture...',
+    'Mapping hydration...',
+    'Assessing oiliness...',
+    'Preparing your profile...',
+  ],
+};
+
+const SKIN_PHRASE_INTERVAL_MS = 700;
+
 interface FaceScanAnimationProps {
   imageSrc: string;
   locale: Locale;
@@ -31,6 +57,7 @@ interface FaceScanAnimationProps {
 export function FaceScanAnimation({ imageSrc, locale, variant = 'capture' }: FaceScanAnimationProps) {
   const maskId = useId().replace(/:/g, '');
   const [phase, setPhase] = useState<ScanPhase>(variant === 'skin' ? 'analysing' : 'scanning');
+  const [phraseIndex, setPhraseIndex] = useState(0);
 
   useEffect(() => {
     if (variant === 'skin') return;
@@ -38,6 +65,20 @@ export function FaceScanAnimation({ imageSrc, locale, variant = 'capture' }: Fac
     const timer = setTimeout(() => setPhase('validating'), 1400);
     return () => clearTimeout(timer);
   }, [variant]);
+
+  useEffect(() => {
+    if (variant !== 'skin') return;
+
+    const phrases = SKIN_ANALYSIS_PHRASES[locale];
+    const timer = setInterval(() => {
+      setPhraseIndex((current) => (current + 1) % phrases.length);
+    }, SKIN_PHRASE_INTERVAL_MS);
+
+    return () => clearInterval(timer);
+  }, [variant, locale]);
+
+  const statusText =
+    variant === 'skin' ? SKIN_ANALYSIS_PHRASES[locale][phraseIndex] : PHASE_TEXT[phase][locale];
 
   return (
     <div className="face-scan-animation">
@@ -66,7 +107,7 @@ export function FaceScanAnimation({ imageSrc, locale, variant = 'capture' }: Fac
 
       <div className="face-scan-animation-status">
         <div className="face-scan-spinner" aria-hidden />
-        <p className="text-sm font-medium text-white">{PHASE_TEXT[phase][locale]}</p>
+        <p className="text-sm font-medium text-white">{statusText}</p>
       </div>
     </div>
   );

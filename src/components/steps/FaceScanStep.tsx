@@ -10,7 +10,7 @@ interface FaceScanStepProps {
   onComplete: () => void;
 }
 
-const SKIN_ANALYSIS_MS = 2400;
+const SKIN_ANALYSIS_MS = 3500;
 
 export function FaceScanStep({ locale, faceImage, onImage, onComplete }: FaceScanStepProps) {
   const [analysing, setAnalysing] = useState(false);

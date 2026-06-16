@@ -4,34 +4,40 @@ import type { Locale, QuizStep } from '@/types/quiz';
 
 const features = [
   {
-    key: 'products',
-    en: 'Extensive product recommendations',
-    pt: 'Recomendações extensas de produtos',
-    es: 'Recomendaciones extensas de productos',
+    key: 'assessment',
+    en: 'Complete assessment of your skin',
+    pt: 'Avaliação completa da sua pele',
+    es: 'Evaluación completa de tu piel',
   },
   {
-    key: 'lifting',
-    en: 'Dozens of facelifting techniques',
-    pt: 'Dezenas de técnicas de lifting facial',
-    es: 'Docenas de técnicas de lifting facial',
+    key: 'needs',
+    en: 'Identification of real needs',
+    pt: 'Identificação de necessidades reais',
+    es: 'Identificación de necesidades reales',
   },
   {
-    key: 'scanner',
-    en: 'Skin analysis by smart face scanner',
-    pt: 'Análise de pele com scanner facial inteligente',
-    es: 'Análisis de piel con escáner facial inteligente',
+    key: 'routine',
+    en: 'Personalized routine based on your skin analysis',
+    pt: 'Rotina personalizada baseada na análise da sua pele',
+    es: 'Rutina personalizada basada en el análisis de tu piel',
   },
   {
-    key: 'derma',
-    en: 'Dermatology approved skin guidance',
-    pt: 'Orientação de pele aprovada por dermatologistas',
-    es: 'Orientación de piel aprobada por dermatólogos',
+    key: 'science',
+    en: 'Science-based recommendations',
+    pt: 'Recomendações baseadas em ciência',
+    es: 'Recomendaciones basadas en ciencia',
   },
   {
-    key: 'quality',
-    en: 'Visibly improve your skin quality',
-    pt: 'Melhore visivelmente a qualidade da sua pele',
-    es: 'Mejora visiblemente la calidad de tu piel',
+    key: 'tracking',
+    en: 'Tracking your progress',
+    pt: 'Acompanhamento da sua evolução',
+    es: 'Seguimiento de tu evolución',
+  },
+  {
+    key: 'results',
+    en: 'Visible and lasting results',
+    pt: 'Resultados visíveis e duradouros',
+    es: 'Resultados visibles y duraderos',
   },
 ] as const;
 
@@ -49,13 +55,13 @@ export function WelcomeStep({ step, locale }: WelcomeStepProps) {
 
       <div className="welcome-hero-image mx-auto mb-8 w-full max-w-[360px]">
         <img
-          src="/welcome-before-after.png"
+          src="/welcome-skin-analysis.jpg"
           alt={
             locale === 'pt'
-              ? 'Comparação de pele: Dia 0 e Dia 30'
+              ? 'Análise de pele com IA — hidratação, rugas, manchas, elasticidade, textura e barreira cutânea'
               : locale === 'es'
-                ? 'Comparación de piel: Día 0 y Día 30'
-                : 'Skin comparison: Day 0 and Day 30'
+                ? 'Análisis de piel con IA — hidratación, arrugas, manchas, elasticidad, textura y barrera cutánea'
+                : 'AI-powered skin analysis — hydration, wrinkles, dark spots, elasticity, texture and skin barrier'
           }
           className="h-auto w-full object-contain"
           draggable={false}

@@ -5,8 +5,10 @@ import { useFaceDetector } from '@/hooks/useFaceDetector';
 import {
   FACE_CONTOUR_PATH,
   getPrimaryValidationHint,
+  loadImageFromDataUrl,
   measureBrightness,
   measureSharpness,
+  validateCapturedPhoto,
   validateFaceCapture,
   type FaceValidationIssue,
 } from '@/lib/face-validation';
@@ -18,7 +20,7 @@ interface FaceCaptureCameraProps {
 }
 
 type CameraState = 'loading' | 'active' | 'denied' | 'unsupported';
-type CaptureState = 'live' | 'scanning';
+type CaptureState = 'live' | 'scanning' | 'invalid';
 
 const SCAN_DURATION_MS = 2800;
 
@@ -111,6 +113,16 @@ const UI: Record<string, Record<Locale, string>> = {
     es: 'Tu imagen es privada y segura',
     en: 'Your image is private and secure',
   },
+  retake: {
+    pt: 'Tirar foto novamente',
+    es: 'Tomar foto de nuevo',
+    en: 'Take photo again',
+  },
+  invalidCapture: {
+    pt: 'Não conseguimos validar sua selfie. Tente novamente com boa luz e o rosto bem visível.',
+    es: 'No pudimos validar tu selfie. Intenta de nuevo con buena luz y el rostro bien visible.',
+    en: 'We could not validate your selfie. Try again with good lighting and your face clearly visible.',
+  },
 };
 
 function FaceContourOverlay({ ready, maskId }: { ready: boolean; maskId: string }) {
@@ -147,12 +159,13 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
   const lastCheckRef = useRef(0);
   const scanStartedAtRef = useRef<number | null>(null);
 
-  const { ready: detectorReady, error: detectorError, detectFaces } = useFaceDetector();
+  const { ready: detectorReady, error: detectorError, detectFaces, detectFacesInImage } = useFaceDetector();
   const [cameraState, setCameraState] = useState<CameraState>('loading');
   const [captureState, setCaptureState] = useState<CaptureState>('live');
   const [hint, setHint] = useState<FaceValidationIssue | 'ready' | null>(null);
   const [canCapture, setCanCapture] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [validationIssue, setValidationIssue] = useState<FaceValidationIssue | null>(null);
 
   const stopCamera = useCallback(() => {
     if (rafRef.current !== null) {
@@ -168,6 +181,7 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
     setCameraState('loading');
     setCaptureState('live');
     setCapturedImage(null);
+    setValidationIssue(null);
     setHint(null);
     setCanCapture(false);
 
@@ -255,17 +269,49 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
   }, [cameraState, detectorReady, detectFaces, captureState]);
 
   useEffect(() => {
-    if (captureState !== 'scanning' || !capturedImage || scanStartedAtRef.current === null) return;
+    if (captureState !== 'scanning' || !capturedImage || scanStartedAtRef.current === null || !detectorReady) {
+      return;
+    }
 
     let cancelled = false;
 
     const finishScan = async () => {
+      const img = await loadImageFromDataUrl(capturedImage);
+      const canvas = canvasRef.current;
+      const ctx = canvas?.getContext('2d', { willReadFrequently: true });
+
+      let validationResult = { valid: false, issues: ['no-face' as FaceValidationIssue] };
+
+      if (canvas && ctx && img.naturalWidth > 0) {
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0);
+
+        const faces = detectFacesInImage(canvas);
+        const brightness = measureBrightness(ctx, canvas.width, canvas.height);
+        const sharpness = measureSharpness(ctx, canvas.width, canvas.height);
+        validationResult = validateCapturedPhoto(
+          faces,
+          canvas.width,
+          canvas.height,
+          brightness,
+          sharpness,
+        );
+      }
+
       const elapsed = performance.now() - scanStartedAtRef.current!;
       const remaining = Math.max(0, SCAN_DURATION_MS - elapsed);
       await new Promise((resolve) => setTimeout(resolve, remaining));
 
       if (cancelled) return;
-      onCapture(capturedImage);
+
+      if (validationResult.valid) {
+        onCapture(capturedImage);
+        return;
+      }
+
+      setValidationIssue(getPrimaryValidationHint(validationResult.issues));
+      setCaptureState('invalid');
     };
 
     void finishScan();
@@ -273,7 +319,7 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
     return () => {
       cancelled = true;
     };
-  }, [captureState, capturedImage, onCapture]);
+  }, [captureState, capturedImage, onCapture, detectorReady, detectFacesInImage]);
 
   const captureFrame = () => {
     const video = videoRef.current;
@@ -285,11 +331,7 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    ctx.save();
-    ctx.translate(canvas.width, 0);
-    ctx.scale(-1, 1);
     ctx.drawImage(video, 0, 0);
-    ctx.restore();
 
     return canvas.toDataURL('image/jpeg', 0.92);
   };
@@ -339,6 +381,29 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
     );
   }
 
+  if (captureState === 'invalid' && capturedImage) {
+    const issueText = validationIssue ? HINTS[validationIssue][locale] : UI.invalidCapture[locale];
+
+    return (
+      <div className="face-capture-fullscreen">
+        <img src={capturedImage} alt="" className="face-capture-video" />
+
+        <div className="face-capture-overlay-bottom">
+          <p className="text-center text-sm font-medium text-white">{issueText}</p>
+          <button
+            type="button"
+            onClick={startCamera}
+            className="mt-4 rounded-pill bg-quiz-accent px-8 py-3 text-sm font-semibold text-gold"
+          >
+            {UI.retake[locale]}
+          </button>
+        </div>
+
+        <canvas ref={canvasRef} className="hidden" aria-hidden />
+      </div>
+    );
+  }
+
   const hintText =
     hint === 'ready'
       ? UI.ready[locale]
@@ -352,7 +417,7 @@ export function FaceCaptureCamera({ locale, onCapture }: FaceCaptureCameraProps)
 
   return (
     <div className="face-capture-fullscreen">
-      <video ref={videoRef} playsInline muted autoPlay className="face-capture-video" />
+      <video ref={videoRef} playsInline muted autoPlay className="face-capture-video face-capture-video--live" />
 
       <FaceContourOverlay ready={canCapture} maskId={maskId} />
 

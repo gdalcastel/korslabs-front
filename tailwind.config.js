@@ -15,6 +15,8 @@ export default {
         deco: '#DDDDDD',
         arches: '#C13515',
         gold: '#C9A962',
+        'gold-dark': '#A8883A',
+        'gold-light': '#F5EDD6',
         quiz: {
           accent: '#222222',
           'accent-dark': '#000000',

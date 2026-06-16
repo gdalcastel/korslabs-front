@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { useQuizHydration } from '@/hooks/useQuizHydration';
 import { useQuizStepUrl } from '@/hooks/useQuizStepUrl';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
 import { QuizLayout } from '@/components/QuizLayout';
@@ -34,6 +35,7 @@ export function QuizApp() {
     reset,
   } = useQuizStore();
 
+  const hydrated = useQuizHydration();
   useQuizStepUrl(currentStepIndex, goToStep);
 
   const step = quizSteps[currentStepIndex];
@@ -135,7 +137,32 @@ export function QuizApp() {
           />
         );
       case 'results':
-        return profile && plan ? (
+        if (!hydrated) {
+          return (
+            <div className="flex flex-1 items-center justify-center py-16">
+              <div className="h-10 w-10 animate-spin rounded-full border-[3px] border-gold/25 border-t-gold" />
+            </div>
+          );
+        }
+        if (!profile || !plan) {
+          return (
+            <div className="space-y-4 py-8 text-center">
+              <p className="text-[15px] text-[#717171]">
+                {locale === 'pt'
+                  ? 'Nenhum resultado encontrado. Refaça o quiz para gerar seu plano.'
+                  : locale === 'es'
+                    ? 'No se encontraron resultados. Repite el quiz para generar tu plan.'
+                    : 'No results found. Retake the quiz to generate your plan.'}
+              </p>
+              <div className="btn-primary-wrap">
+                <button type="button" className="btn-primary" onClick={reset}>
+                  {locale === 'pt' ? 'Refazer quiz' : locale === 'es' ? 'Repetir quiz' : 'Retake quiz'}
+                </button>
+              </div>
+            </div>
+          );
+        }
+        return (
           <ResultsStep
             step={step}
             locale={locale}
@@ -143,7 +170,7 @@ export function QuizApp() {
             plan={plan}
             onRestart={reset}
           />
-        ) : null;
+        );
       default:
         return null;
     }
